@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+#### Phase 2: Mock Workout Data Generation
+- Python script to generate 50 mock cycling workout entries in `scripts/generate_mock_data.py`
+- Mock data stored in JSON format at `data_store/workouts.json`
+- Realistic workout data with proper TSS calculations based on duration, power, and workout type
+- Training plan generator that creates realistic patterns (build weeks, recovery weeks, rest days)
+- Comprehensive test suite for data generation logic
+- Data model includes: id, date, duration_minutes, distance_km, avg_power_watts, tss, workout_type
+
 #### Phase 1: MCP Server Skeleton
 - MCP server skeleton implementation using FastMCP framework
 - Basic server initialization with logging configuration  

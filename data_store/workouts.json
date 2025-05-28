@@ -1,0 +1,452 @@
+[
+  {
+    "id": "47ef5610-144b-412d-84ff-5fcb1c297fc3",
+    "date": "2025-02-27",
+    "duration_minutes": 74,
+    "distance_km": 26.8,
+    "avg_power_watts": 153,
+    "tss": 56,
+    "workout_type": "threshold"
+  },
+  {
+    "id": "3c430a76-ccdf-42bb-b048-dd27bedb729b",
+    "date": "2025-02-28",
+    "duration_minutes": 44,
+    "distance_km": 13.3,
+    "avg_power_watts": 117,
+    "tss": 20,
+    "workout_type": "recovery"
+  },
+  {
+    "id": "3275d782-d806-45de-bca8-749ccda70d73",
+    "date": "2025-03-01",
+    "duration_minutes": 154,
+    "distance_km": 62.7,
+    "avg_power_watts": 219,
+    "tss": 150,
+    "workout_type": "threshold"
+  },
+  {
+    "id": "d4738c4e-8573-47e0-99c5-52324f915daf",
+    "date": "2025-03-02",
+    "duration_minutes": 49,
+    "distance_km": 18.7,
+    "avg_power_watts": 203,
+    "tss": 59,
+    "workout_type": "interval"
+  },
+  {
+    "id": "4561ac0d-71e7-4be7-99cc-582a8dc8e425",
+    "date": "2025-03-04",
+    "duration_minutes": 124,
+    "distance_km": 51.4,
+    "avg_power_watts": 227,
+    "tss": 84,
+    "workout_type": "endurance"
+  },
+  {
+    "id": "984e6be4-e94d-4cbe-a901-ca53169685d7",
+    "date": "2025-03-05",
+    "duration_minutes": 75,
+    "distance_km": 26.8,
+    "avg_power_watts": 169,
+    "tss": 25,
+    "workout_type": "recovery"
+  },
+  {
+    "id": "0eb8b8cc-ddb7-419c-aead-4a8357bd646d",
+    "date": "2025-03-06",
+    "duration_minutes": 135,
+    "distance_km": 57.1,
+    "avg_power_watts": 185,
+    "tss": 99,
+    "workout_type": "tempo"
+  },
+  {
+    "id": "d5e18c6a-ee22-45bb-b13f-3ccd91079f0f",
+    "date": "2025-03-07",
+    "duration_minutes": 78,
+    "distance_km": 23.6,
+    "avg_power_watts": 120,
+    "tss": 20,
+    "workout_type": "recovery"
+  },
+  {
+    "id": "f38f3317-65eb-43b1-93b6-9c46a5ea962c",
+    "date": "2025-03-08",
+    "duration_minutes": 95,
+    "distance_km": 32.0,
+    "avg_power_watts": 169,
+    "tss": 64,
+    "workout_type": "tempo"
+  },
+  {
+    "id": "74646716-0259-4d13-8d3c-6cd296c71992",
+    "date": "2025-03-09",
+    "duration_minutes": 58,
+    "distance_km": 24.5,
+    "avg_power_watts": 211,
+    "tss": 73,
+    "workout_type": "interval"
+  },
+  {
+    "id": "816614ef-64b8-4d6f-bf8b-29dea026e495",
+    "date": "2025-03-11",
+    "duration_minutes": 168,
+    "distance_km": 70.1,
+    "avg_power_watts": 194,
+    "tss": 130,
+    "workout_type": "tempo"
+  },
+  {
+    "id": "43f99801-e080-4c55-92ab-b47929e3b180",
+    "date": "2025-03-12",
+    "duration_minutes": 76,
+    "distance_km": 26.6,
+    "avg_power_watts": 158,
+    "tss": 24,
+    "workout_type": "recovery"
+  },
+  {
+    "id": "de3afb8e-7bf7-4483-b9f5-3e82060812e1",
+    "date": "2025-03-13",
+    "duration_minutes": 55,
+    "distance_km": 28.2,
+    "avg_power_watts": 270,
+    "tss": 89,
+    "workout_type": "interval"
+  },
+  {
+    "id": "f2bdff8f-4f6f-47ca-a982-008bb72e365c",
+    "date": "2025-03-14",
+    "duration_minutes": 66,
+    "distance_km": 20.5,
+    "avg_power_watts": 124,
+    "tss": 24,
+    "workout_type": "endurance"
+  },
+  {
+    "id": "23fbf781-112e-41c2-ac14-91b361a9bda4",
+    "date": "2025-03-15",
+    "duration_minutes": 144,
+    "distance_km": 58.9,
+    "avg_power_watts": 179,
+    "tss": 77,
+    "workout_type": "endurance"
+  },
+  {
+    "id": "d72813d6-4675-49f3-8d9f-6c7710ae5ca9",
+    "date": "2025-03-16",
+    "duration_minutes": 74,
+    "distance_km": 31.4,
+    "avg_power_watts": 212,
+    "tss": 78,
+    "workout_type": "threshold"
+  },
+  {
+    "id": "50e09423-352d-4634-b31d-b4084020b392",
+    "date": "2025-03-18",
+    "duration_minutes": 141,
+    "distance_km": 53.1,
+    "avg_power_watts": 196,
+    "tss": 110,
+    "workout_type": "tempo"
+  },
+  {
+    "id": "d6d6a2ab-9270-422b-9785-244505d9b302",
+    "date": "2025-03-20",
+    "duration_minutes": 43,
+    "distance_km": 14.1,
+    "avg_power_watts": 134,
+    "tss": 20,
+    "workout_type": "endurance"
+  },
+  {
+    "id": "32db78ca-78b7-43f8-8f17-78875ee63afa",
+    "date": "2025-03-21",
+    "duration_minutes": 68,
+    "distance_km": 19.6,
+    "avg_power_watts": 121,
+    "tss": 20,
+    "workout_type": "recovery"
+  },
+  {
+    "id": "d3d125e7-fb89-4460-acaa-f59e2cdf0aaa",
+    "date": "2025-03-22",
+    "duration_minutes": 40,
+    "distance_km": 13.5,
+    "avg_power_watts": 159,
+    "tss": 20,
+    "workout_type": "recovery"
+  },
+  {
+    "id": "2d15fe7c-5420-4a87-9ac1-ccc34f11bb6d",
+    "date": "2025-03-23",
+    "duration_minutes": 73,
+    "distance_km": 25.7,
+    "avg_power_watts": 141,
+    "tss": 20,
+    "workout_type": "recovery"
+  },
+  {
+    "id": "e8da4a8b-6cac-4faf-99d3-c988c6c7cd49",
+    "date": "2025-03-27",
+    "duration_minutes": 89,
+    "distance_km": 33.0,
+    "avg_power_watts": 154,
+    "tss": 41,
+    "workout_type": "endurance"
+  },
+  {
+    "id": "151b5c95-c5eb-4169-adca-00e73298661e",
+    "date": "2025-03-28",
+    "duration_minutes": 47,
+    "distance_km": 11.0,
+    "avg_power_watts": 108,
+    "tss": 20,
+    "workout_type": "endurance"
+  },
+  {
+    "id": "f00800e0-c4ac-4531-8990-1e9f3b586c64",
+    "date": "2025-03-29",
+    "duration_minutes": 172,
+    "distance_km": 80.2,
+    "avg_power_watts": 241,
+    "tss": 150,
+    "workout_type": "threshold"
+  },
+  {
+    "id": "49176e2f-74bc-43df-961f-27dac69c6b9a",
+    "date": "2025-03-30",
+    "duration_minutes": 108,
+    "distance_km": 58.2,
+    "avg_power_watts": 250,
+    "tss": 150,
+    "workout_type": "race"
+  },
+  {
+    "id": "96c534a1-4339-42df-8179-6c2072754a96",
+    "date": "2025-04-01",
+    "duration_minutes": 118,
+    "distance_km": 40.1,
+    "avg_power_watts": 168,
+    "tss": 99,
+    "workout_type": "threshold"
+  },
+  {
+    "id": "38cdb266-99ee-49ef-b94a-4d07982f6a0d",
+    "date": "2025-04-02",
+    "duration_minutes": 77,
+    "distance_km": 28.7,
+    "avg_power_watts": 171,
+    "tss": 26,
+    "workout_type": "recovery"
+  },
+  {
+    "id": "85991586-12d4-411d-b2c5-7a98c427fb32",
+    "date": "2025-04-03",
+    "duration_minutes": 134,
+    "distance_km": 62.1,
+    "avg_power_watts": 204,
+    "tss": 136,
+    "workout_type": "threshold"
+  },
+  {
+    "id": "76b0c246-1f70-4870-bca0-d2a579ef1491",
+    "date": "2025-04-04",
+    "duration_minutes": 53,
+    "distance_km": 18.4,
+    "avg_power_watts": 128,
+    "tss": 20,
+    "workout_type": "endurance"
+  },
+  {
+    "id": "cea36859-9ec2-4e64-a468-86bbdace8eac",
+    "date": "2025-04-05",
+    "duration_minutes": 125,
+    "distance_km": 49.7,
+    "avg_power_watts": 213,
+    "tss": 79,
+    "workout_type": "endurance"
+  },
+  {
+    "id": "df653c00-4217-462c-b7a8-cd9485a2c210",
+    "date": "2025-04-06",
+    "duration_minutes": 59,
+    "distance_km": 27.2,
+    "avg_power_watts": 219,
+    "tss": 64,
+    "workout_type": "threshold"
+  },
+  {
+    "id": "2785007c-25f8-4466-ad87-1c189e5bbf64",
+    "date": "2025-04-08",
+    "duration_minutes": 114,
+    "distance_km": 47.5,
+    "avg_power_watts": 226,
+    "tss": 128,
+    "workout_type": "threshold"
+  },
+  {
+    "id": "53c5156d-f7c8-438c-814b-6d2a2a35ed10",
+    "date": "2025-04-09",
+    "duration_minutes": 68,
+    "distance_km": 23.9,
+    "avg_power_watts": 159,
+    "tss": 32,
+    "workout_type": "endurance"
+  },
+  {
+    "id": "64baa96d-faec-4213-aa76-f5ec34fb1ee1",
+    "date": "2025-04-10",
+    "duration_minutes": 46,
+    "distance_km": 26.9,
+    "avg_power_watts": 287,
+    "tss": 85,
+    "workout_type": "race"
+  },
+  {
+    "id": "15ca7733-025c-428e-af87-518aed3f3c5f",
+    "date": "2025-04-11",
+    "duration_minutes": 79,
+    "distance_km": 22.3,
+    "avg_power_watts": 143,
+    "tss": 33,
+    "workout_type": "endurance"
+  },
+  {
+    "id": "4bc98e1d-406d-4757-8dea-3043d177071b",
+    "date": "2025-04-12",
+    "duration_minutes": 80,
+    "distance_km": 30.4,
+    "avg_power_watts": 208,
+    "tss": 66,
+    "workout_type": "tempo"
+  },
+  {
+    "id": "8f7cb1a9-a222-4783-a789-5eac179b5402",
+    "date": "2025-04-13",
+    "duration_minutes": 78,
+    "distance_km": 42.9,
+    "avg_power_watts": 264,
+    "tss": 133,
+    "workout_type": "race"
+  },
+  {
+    "id": "f36a3288-1f99-4150-b237-ad1322bc1a12",
+    "date": "2025-04-15",
+    "duration_minutes": 176,
+    "distance_km": 69.0,
+    "avg_power_watts": 163,
+    "tss": 143,
+    "workout_type": "threshold"
+  },
+  {
+    "id": "4f5815a7-fbd5-45fd-aaba-40e06a7c2a6a",
+    "date": "2025-04-17",
+    "duration_minutes": 83,
+    "distance_km": 30.5,
+    "avg_power_watts": 164,
+    "tss": 40,
+    "workout_type": "endurance"
+  },
+  {
+    "id": "eae7b433-5448-4ba2-bee3-90faf68187c8",
+    "date": "2025-04-18",
+    "duration_minutes": 53,
+    "distance_km": 15.2,
+    "avg_power_watts": 120,
+    "tss": 20,
+    "workout_type": "recovery"
+  },
+  {
+    "id": "ef0add5b-6490-487c-a3cf-9ee02053b293",
+    "date": "2025-04-19",
+    "duration_minutes": 68,
+    "distance_km": 21.6,
+    "avg_power_watts": 141,
+    "tss": 20,
+    "workout_type": "recovery"
+  },
+  {
+    "id": "e1b79a42-c12a-4ec6-8c88-427d8eb49d36",
+    "date": "2025-04-20",
+    "duration_minutes": 89,
+    "distance_km": 32.4,
+    "avg_power_watts": 146,
+    "tss": 25,
+    "workout_type": "recovery"
+  },
+  {
+    "id": "1671c887-8892-4450-9285-aaaf00a28da8",
+    "date": "2025-04-24",
+    "duration_minutes": 90,
+    "distance_km": 28.7,
+    "avg_power_watts": 157,
+    "tss": 56,
+    "workout_type": "tempo"
+  },
+  {
+    "id": "63f8beff-d947-4341-8520-a7883f929717",
+    "date": "2025-04-25",
+    "duration_minutes": 35,
+    "distance_km": 13.5,
+    "avg_power_watts": 162,
+    "tss": 20,
+    "workout_type": "recovery"
+  },
+  {
+    "id": "ee6e8ca3-f6c5-47e2-aa62-c4fab208cd6b",
+    "date": "2025-04-26",
+    "duration_minutes": 158,
+    "distance_km": 51.0,
+    "avg_power_watts": 166,
+    "tss": 131,
+    "workout_type": "threshold"
+  },
+  {
+    "id": "e39d5426-a5b5-41ac-ad90-429e7725594b",
+    "date": "2025-04-27",
+    "duration_minutes": 115,
+    "distance_km": 49.2,
+    "avg_power_watts": 221,
+    "tss": 150,
+    "workout_type": "interval"
+  },
+  {
+    "id": "4239c5f9-33ac-45ae-b737-2635ee5a4145",
+    "date": "2025-04-29",
+    "duration_minutes": 114,
+    "distance_km": 48.0,
+    "avg_power_watts": 177,
+    "tss": 100,
+    "workout_type": "threshold"
+  },
+  {
+    "id": "84cb9757-4d89-4809-8af9-63d72b802d9b",
+    "date": "2025-04-30",
+    "duration_minutes": 75,
+    "distance_km": 22.9,
+    "avg_power_watts": 139,
+    "tss": 20,
+    "workout_type": "recovery"
+  },
+  {
+    "id": "163fc719-5bf7-4a2c-b153-01a6e53c63a2",
+    "date": "2025-05-01",
+    "duration_minutes": 143,
+    "distance_km": 58.0,
+    "avg_power_watts": 197,
+    "tss": 140,
+    "workout_type": "threshold"
+  },
+  {
+    "id": "ff7eca5e-4e4b-4b19-a33b-98fc7616aaa5",
+    "date": "2025-05-02",
+    "duration_minutes": 37,
+    "distance_km": 10.1,
+    "avg_power_watts": 131,
+    "tss": 20,
+    "workout_type": "endurance"
+  }
+]
