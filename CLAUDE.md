@@ -28,6 +28,16 @@ pytest tests/test_main.py::test_name
 
 # Format code
 black .
+
+# Lint code
+ruff check .
+ruff check --fix .
+
+# Type check
+mypy src/
+
+# Run all checks (format, lint, type check, tests)
+black . && ruff check . && mypy src/ && pytest
 ```
 
 ## Architecture & Key Design Decisions
@@ -42,8 +52,15 @@ Follow behavior-driven testing (ADR-001):
 - Avoid testing implementation details
 
 ### Data Model
-- Single JSON file stores 50 mock cycling workouts
-- Each workout contains: date, duration, TSS (Training Stress Score), description
+- Single JSON file (`data_store/workouts.json`) stores 50 mock cycling workouts
+- Each workout contains:
+  - `id`: UUID string
+  - `date`: ISO format date (YYYY-MM-DD)
+  - `duration_minutes`: Integer
+  - `distance_km`: Float
+  - `avg_power_watts`: Integer
+  - `tss`: Training Stress Score (Integer)
+  - `workout_type`: String ("endurance", "interval", "recovery", "threshold")
 
 ### Fitness Metrics Calculations
 - **Fitness (CTL)**: 42-day exponentially weighted moving average of TSS
@@ -52,13 +69,25 @@ Follow behavior-driven testing (ADR-001):
 
 ## Implementation Status
 
-Currently skeleton only - `src/main.py` needs to be replaced with actual MCP server implementation using FastMCP. The following tools need to be implemented:
-1. `get_workouts` - Retrieve workout history with optional date filtering
-2. `calculate_fitness_metrics` - Calculate CTL, ATL, and TSB for a given date
-3. `analyze_performance` - Provide insights based on training patterns
+Currently skeleton only - `src/workout_mcp_server/main.py` needs to be replaced with actual MCP server implementation using FastMCP. The following tools need to be implemented according to README:
+1. `get_last_50_workouts` - Retrieves all 50 workouts, sorted by date (most recent first)
+2. `get_last_7_workouts` - Retrieves the 7 most recent workouts
+3. `get_workout_by_id` - Retrieves specific workout by ID
+4. `compute_fitness` - Calculates CTL (42-day EWMA of TSS)
+5. `compute_fatigue` - Calculates ATL (7-day EWMA of TSS)
+6. `compute_form` - Calculates TSB (CTL - ATL)
 
 ## Key Files
-- `src/main.py` - Main MCP server implementation (needs to be written)
+- `src/workout_mcp_server/main.py` - Main MCP server implementation (needs to be written)
+- `src/workout_mcp_server/tools/` - Directory for tool implementations
+- `data_store/workouts.json` - Mock workout data
 - `tests/` - Test files following pytest conventions
 - `docs/project-prd.md` - Detailed product requirements
 - `docs/adr/` - Architecture decision records
+
+## Code Style
+- Python 3.10+ with type hints
+- Black formatting (88 char line length)
+- Ruff linting with E, F, I, UP rules
+- MyPy for type checking with strict settings
+- Async/await patterns for MCP tools
