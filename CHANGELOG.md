@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+#### Phase 2: Data Loading Functionality (Issue #9)
+- Comprehensive data loading module in `src/workout_mcp_server/data_loader.py`
+- Pydantic-based `Workout` model for data validation and parsing
+- `WorkoutDataLoader` class with caching support for efficient data access
+- Functions to load, validate, sort, and filter workout data by date range
+- Automatic date parsing from ISO format strings to datetime objects
+- Robust error handling with custom `WorkoutDataError` exception
+- Full test coverage with 26 unit tests for all data loading functionality
+- Type hints and mypy compliance for all functions and methods
+
 #### Phase 2: Mock Workout Data Generation
 - Python script to generate 50 mock cycling workout entries in `scripts/generate_mock_data.py`
 - Mock data stored in JSON format at `data_store/workouts.json`
