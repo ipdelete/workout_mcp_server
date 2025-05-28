@@ -8,16 +8,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+
+#### Phase 1: MCP Server Skeleton
+- MCP server skeleton implementation using FastMCP framework
+- Basic server initialization with logging configuration  
+- Tools directory structure for future tool implementations
+- Server responds to MCP protocol handshake
+- Tests for server instance creation and configuration
+
+#### Development Environment Setup
 - Python development environment configuration with FastMCP framework
 - Project structure with proper Python package layout in `src/workout_mcp_server/`
 - Development dependencies: pytest, black, mypy, ruff for code quality
 - Basic test suite to verify environment setup
 - Package entry points for running with `python -m workout_mcp_server`
-- MCP server skeleton implementation using FastMCP
-- Basic server initialization with logging configuration
-- Tools directory structure for future tool implementations
-- Server responds to MCP protocol handshake
-- Tests for server instance creation and configuration
 
 ### Changed
 - Python version requirement updated to 3.10+ (required by FastMCP)
