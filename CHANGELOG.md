@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+#### Phase 3: get_workout_by_id Tool Implementation (Issue #10)
+- Implemented `get_workout_by_id` MCP tool in `src/workout_mcp_server/main.py`
+- Tool accepts a workout_id parameter and returns complete workout details
+- Returns appropriate error message if workout not found or on exceptions
+- Leverages existing `WorkoutDataLoader.get_workout_by_id()` method from Phase 2
+- Includes proper error handling and logging
+- Full test coverage with unit tests for success and error cases
+- FastMCP decorator pattern for tool definition with type hints
+
 #### Phase 2: Data Loading Functionality (Issue #9)
 - Comprehensive data loading module in `src/workout_mcp_server/data_loader.py`
 - Pydantic-based `Workout` model for data validation and parsing
