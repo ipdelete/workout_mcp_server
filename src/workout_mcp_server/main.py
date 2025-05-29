@@ -155,6 +155,65 @@ async def compute_fitness(target_date: str) -> dict:
         return {"error": f"Failed to calculate CTL: {str(e)}"}
 
 
+@mcp.tool()
+async def compute_fatigue(target_date: str) -> dict:
+    """Calculate Acute Training Load (ATL) for a given date.
+
+    ATL represents fatigue and is calculated as a 7-day exponentially
+    weighted moving average of Training Stress Score (TSS).
+
+    Args:
+        target_date: Date in ISO format (YYYY-MM-DD) for ATL calculation
+
+    Returns:
+        Dictionary containing ATL value and metadata, or error dictionary
+    """
+    try:
+        # Parse target date
+        try:
+            target_dt = datetime.fromisoformat(target_date)
+        except ValueError:
+            return {
+                "error": f"Invalid date format '{target_date}'. Use YYYY-MM-DD format."
+            }
+
+        # Get all workouts
+        all_workouts = data_loader.get_all_workouts(sort_by_date=False)
+
+        # Get relevant workouts for ATL calculation (7-day window)
+        relevant_workouts = get_workouts_for_ctl_calculation(
+            all_workouts, target_dt, days=7
+        )
+
+        if not relevant_workouts:
+            return {
+                "target_date": target_date,
+                "atl": 0.0,
+                "workouts_count": 0,
+                "message": "No workout data available for ATL calculation",
+            }
+
+        # Extract TSS values in chronological order
+        tss_values = [workout.tss for workout in relevant_workouts]
+
+        # Calculate ATL using 7-day EWMA
+        atl = calculate_ewma(tss_values, time_constant=7)
+
+        return {
+            "target_date": target_date,
+            "atl": round(atl, 1),
+            "workouts_count": len(relevant_workouts),
+            "date_range": {
+                "earliest_workout": relevant_workouts[0].date.strftime("%Y-%m-%d"),
+                "latest_workout": relevant_workouts[-1].date.strftime("%Y-%m-%d"),
+            },
+        }
+
+    except Exception as e:
+        logger.error(f"Error calculating ATL for {target_date}: {e}")
+        return {"error": f"Failed to calculate ATL: {str(e)}"}
+
+
 def configure_logging() -> None:
     """Configure logging for the MCP server."""
     logging.basicConfig(
