@@ -9,6 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+#### Phase 5: compute_fatigue Tool Implementation (Issue #15)
+- Implemented `compute_fatigue` MCP tool for Acute Training Load (ATL) calculation
+- ATL calculated as 7-day exponentially weighted moving average of TSS values
+- Reuses existing EWMA utility function and workout filtering logic from fitness metrics module
+- Tool accepts target_date parameter and returns ATL with metadata (workouts count, date range)
+- Comprehensive error handling for invalid dates, missing data, and exceptions
+- Edge case handling for insufficient workout data with appropriate messaging
+- Full test coverage with 7 new unit tests including responsiveness comparison with CTL
+- Mathematical formula: alpha = 1 - exp(-1/7) for 7-day time constant
+- FastMCP decorator pattern with proper type hints and documentation
+- ATL represents fatigue and is more responsive to recent training load changes than CTL
+
 #### Phase 4: compute_fitness Tool Implementation (Issue #14)
 - Implemented `compute_fitness` MCP tool for Chronic Training Load (CTL) calculation
 - CTL calculated as 42-day exponentially weighted moving average of TSS values
