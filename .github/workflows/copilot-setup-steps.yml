@@ -36,21 +36,18 @@ jobs:
           uv run pytest --version
           uv run mypy --version
           uv run black --version
-          uv run flake8 --version
+          uv run ruff --version
 
       - name: Run initial checks
         run: |
           # Run type checking to ensure environment is valid
-          uv run mypy . || echo "Type checking completed with warnings"
-          
-          # Ensure code is properly formatted
-          uv run black --check src/ tests/ || echo "Code formatting check completed"
+          black . && ruff check . && mypy src/ && pytest
 
       - name: Display project info
         run: |
           echo "Workout MCP Server development environment ready!"
           echo "Key commands:"
-          echo "  - Test: uv run pytest"
-          echo "  - Type check: uv run mypy ."
-          echo "  - Format: uv run black src/ tests/"
-          echo "  - Lint: uv run flake8 src/"
+          echo "  - Test: pytest"
+          echo "  - Type check: mypy src/"
+          echo "  - Format: run black ."
+          echo "  - Lint: uv run ruff check ."
