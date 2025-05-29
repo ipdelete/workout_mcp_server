@@ -1,11 +1,13 @@
 """Workout MCP Server - Main entry point."""
 
 import logging
+from datetime import datetime
 from pathlib import Path
 
 from fastmcp import FastMCP
 
 from .data_loader import WorkoutDataLoader
+from .tools.fitness_metrics import calculate_ewma, get_workouts_for_ctl_calculation
 
 logger = logging.getLogger(__name__)
 
@@ -92,6 +94,65 @@ async def get_last_50_workouts() -> list[dict] | dict:
     except Exception as e:
         logger.error(f"Error retrieving all workouts: {e}")
         return {"error": f"Failed to retrieve workouts: {str(e)}"}
+
+
+@mcp.tool()
+async def compute_fitness(target_date: str) -> dict:
+    """Calculate Chronic Training Load (CTL) for a given date.
+
+    CTL represents fitness and is calculated as a 42-day exponentially
+    weighted moving average of Training Stress Score (TSS).
+
+    Args:
+        target_date: Date in ISO format (YYYY-MM-DD) for CTL calculation
+
+    Returns:
+        Dictionary containing CTL value and metadata, or error dictionary
+    """
+    try:
+        # Parse target date
+        try:
+            target_dt = datetime.fromisoformat(target_date)
+        except ValueError:
+            return {
+                "error": f"Invalid date format '{target_date}'. Use YYYY-MM-DD format."
+            }
+
+        # Get all workouts
+        all_workouts = data_loader.get_all_workouts(sort_by_date=False)
+
+        # Get relevant workouts for CTL calculation (42-day window)
+        relevant_workouts = get_workouts_for_ctl_calculation(
+            all_workouts, target_dt, days=42
+        )
+
+        if not relevant_workouts:
+            return {
+                "target_date": target_date,
+                "ctl": 0.0,
+                "workouts_count": 0,
+                "message": "No workout data available for CTL calculation",
+            }
+
+        # Extract TSS values in chronological order
+        tss_values = [workout.tss for workout in relevant_workouts]
+
+        # Calculate CTL using 42-day EWMA
+        ctl = calculate_ewma(tss_values, time_constant=42)
+
+        return {
+            "target_date": target_date,
+            "ctl": round(ctl, 1),
+            "workouts_count": len(relevant_workouts),
+            "date_range": {
+                "earliest_workout": relevant_workouts[0].date.strftime("%Y-%m-%d"),
+                "latest_workout": relevant_workouts[-1].date.strftime("%Y-%m-%d"),
+            },
+        }
+
+    except Exception as e:
+        logger.error(f"Error calculating CTL for {target_date}: {e}")
+        return {"error": f"Failed to calculate CTL: {str(e)}"}
 
 
 def configure_logging() -> None:
