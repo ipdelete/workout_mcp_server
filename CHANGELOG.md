@@ -9,6 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+#### Phase 4: compute_fitness Tool Implementation (Issue #14)
+- Implemented `compute_fitness` MCP tool for Chronic Training Load (CTL) calculation
+- CTL calculated as 42-day exponentially weighted moving average of TSS values
+- Reusable EWMA utility function in `src/workout_mcp_server/tools/fitness_metrics.py`
+- Tool accepts target_date parameter and returns CTL with metadata (workouts count, date range)
+- Comprehensive error handling for invalid dates, missing data, and exceptions
+- Edge case handling for insufficient workout data with appropriate messaging
+- Full test coverage with 20 new unit tests for EWMA calculations and tool functionality
+- Mathematical formula: alpha = 1 - exp(-1/42) for 42-day time constant
+- FastMCP decorator pattern with proper type hints and documentation
+- Fitness metrics module designed for reuse by future ATL and TSB tools
+
 #### Phase 3: get_last_50_workouts Tool Implementation (Issue #13)
 - Implemented `get_last_50_workouts` MCP tool in `src/workout_mcp_server/main.py`
 - Tool returns all 50 workouts from the dataset providing complete training history

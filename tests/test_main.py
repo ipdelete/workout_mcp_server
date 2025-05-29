@@ -348,3 +348,162 @@ async def test_get_last_50_workouts_exception():
         assert "error" in result
         assert "Failed to retrieve workouts" in result["error"]
         assert "Database error" in result["error"]
+
+
+def test_compute_fitness_tool_exists():
+    """Test that compute_fitness tool is registered."""
+    from workout_mcp_server.main import compute_fitness
+
+    assert callable(compute_fitness)
+    assert hasattr(compute_fitness, "__doc__")
+    assert "Chronic Training Load" in compute_fitness.__doc__
+    assert "CTL" in compute_fitness.__doc__
+
+
+async def test_compute_fitness_success():
+    """Test successful CTL calculation."""
+    from datetime import datetime, timedelta
+    from unittest.mock import patch
+
+    from workout_mcp_server.data_loader import Workout
+    from workout_mcp_server.main import compute_fitness
+
+    # Create mock workouts over several weeks
+    mock_workouts = []
+    base_date = datetime(2024, 1, 1)
+    for i in range(30):  # 30 days of workouts
+        workout_date = base_date + timedelta(days=i)
+        mock_workouts.append(
+            Workout(
+                id=f"test-{i:02d}",
+                date=workout_date,
+                duration_minutes=60 + (i % 10),
+                distance_km=30.0 + (i % 5),
+                avg_power_watts=200 + (i % 20),
+                tss=75 + (i % 25),  # TSS varies from 75-99
+                workout_type="endurance",
+            )
+        )
+
+    with patch("workout_mcp_server.main.data_loader") as mock_loader:
+        mock_loader.get_all_workouts.return_value = mock_workouts
+
+        result = await compute_fitness("2024-01-30")
+
+        assert isinstance(result, dict)
+        assert "error" not in result
+        assert result["target_date"] == "2024-01-30"
+        assert "ctl" in result
+        assert isinstance(result["ctl"], float)
+        assert result["ctl"] > 0  # Should have positive CTL with workouts
+        assert result["workouts_count"] == 30
+        assert "date_range" in result
+        assert result["date_range"]["earliest_workout"] == "2024-01-01"
+        assert result["date_range"]["latest_workout"] == "2024-01-30"
+
+        mock_loader.get_all_workouts.assert_called_once_with(sort_by_date=False)
+
+
+async def test_compute_fitness_no_workouts():
+    """Test CTL calculation with no workout data."""
+    from unittest.mock import patch
+
+    from workout_mcp_server.main import compute_fitness
+
+    with patch("workout_mcp_server.main.data_loader") as mock_loader:
+        mock_loader.get_all_workouts.return_value = []
+
+        result = await compute_fitness("2024-01-15")
+
+        assert isinstance(result, dict)
+        assert "error" not in result
+        assert result["target_date"] == "2024-01-15"
+        assert result["ctl"] == 0.0
+        assert result["workouts_count"] == 0
+        assert "message" in result
+        assert "No workout data available" in result["message"]
+
+
+async def test_compute_fitness_invalid_date():
+    """Test CTL calculation with invalid date format."""
+    from workout_mcp_server.main import compute_fitness
+
+    result = await compute_fitness("invalid-date")
+
+    assert isinstance(result, dict)
+    assert "error" in result
+    assert "Invalid date format" in result["error"]
+    assert "invalid-date" in result["error"]
+    assert "YYYY-MM-DD" in result["error"]
+
+
+async def test_compute_fitness_realistic_values():
+    """Test CTL calculation produces realistic fitness values."""
+    from datetime import datetime, timedelta
+    from unittest.mock import patch
+
+    from workout_mcp_server.data_loader import Workout
+    from workout_mcp_server.main import compute_fitness
+
+    # Create workouts with realistic TSS progression
+    mock_workouts = []
+    base_date = datetime(2024, 1, 1)
+    tss_values = [
+        85,
+        95,
+        60,
+        110,
+        0,
+        0,
+        125,
+        90,
+        80,
+        105,
+    ]  # Week pattern with rest days
+
+    for i in range(50):  # 50 days of workouts
+        workout_date = base_date + timedelta(days=i)
+        tss = tss_values[i % len(tss_values)]
+
+        if tss > 0:  # Only create workout if TSS > 0 (no rest days)
+            mock_workouts.append(
+                Workout(
+                    id=f"test-{i:02d}",
+                    date=workout_date,
+                    duration_minutes=int(tss * 0.8),  # Approximate duration
+                    distance_km=30.0,
+                    avg_power_watts=200,
+                    tss=tss,
+                    workout_type="endurance",
+                )
+            )
+
+    with patch("workout_mcp_server.main.data_loader") as mock_loader:
+        mock_loader.get_all_workouts.return_value = mock_workouts
+
+        result = await compute_fitness("2024-02-20")
+
+        assert isinstance(result, dict)
+        assert "error" not in result
+
+        # CTL should be in realistic range for cycling fitness
+        assert 60 <= result["ctl"] <= 120
+        assert result["workouts_count"] > 30  # Should have many workouts
+        assert result["ctl"] > 0
+
+
+async def test_compute_fitness_exception():
+    """Test handling of exceptions during CTL calculation."""
+    from unittest.mock import patch
+
+    from workout_mcp_server.main import compute_fitness
+
+    with patch("workout_mcp_server.main.data_loader") as mock_loader:
+        mock_loader.get_all_workouts.side_effect = Exception("Database error")
+
+        result = await compute_fitness("2024-01-15")
+
+        assert isinstance(result, dict)
+        assert "error" in result
+        assert "Failed to calculate CTL" in result["error"]
+        assert "Database error" in result["error"]
