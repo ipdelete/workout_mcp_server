@@ -232,3 +232,119 @@ async def test_get_last_7_workouts_exception():
         assert "error" in result
         assert "Failed to retrieve workouts" in result["error"]
         assert "Database error" in result["error"]
+
+
+def test_get_last_50_workouts_tool_exists():
+    """Test that get_last_50_workouts tool is registered."""
+    from workout_mcp_server.main import get_last_50_workouts
+
+    assert callable(get_last_50_workouts)
+    assert hasattr(get_last_50_workouts, "__doc__")
+    assert "all 50 workouts" in get_last_50_workouts.__doc__
+    assert "complete training history" in get_last_50_workouts.__doc__
+
+
+async def test_get_last_50_workouts_success():
+    """Test successful retrieval of all 50 workouts."""
+    from datetime import datetime, timedelta
+    from unittest.mock import patch
+
+    from workout_mcp_server.data_loader import Workout
+    from workout_mcp_server.main import get_last_50_workouts
+
+    # Create mock workouts (50 workouts)
+    mock_workouts = [
+        Workout(
+            id=f"test-{i:02d}",
+            date=datetime(2024, 1, 1) + timedelta(days=i),
+            duration_minutes=60 + i,
+            distance_km=30.0 + i,
+            avg_power_watts=200 + i,
+            tss=75 + i,
+            workout_type="endurance",
+        )
+        for i in range(50)
+    ]
+
+    with patch("workout_mcp_server.main.data_loader") as mock_loader:
+        mock_loader.get_all_workouts.return_value = mock_workouts
+
+        result = await get_last_50_workouts()
+
+        # Should return exactly 50 workouts
+        assert isinstance(result, list)
+        assert len(result) == 50
+
+        # Should be ordered by date (already sorted by data_loader)
+        assert result[0]["id"] == "test-00"
+        assert result[49]["id"] == "test-49"
+
+        # Check that each workout has all required fields
+        for workout_dict in result:
+            assert "id" in workout_dict
+            assert "date" in workout_dict
+            assert "duration_minutes" in workout_dict
+            assert "distance_km" in workout_dict
+            assert "avg_power_watts" in workout_dict
+            assert "tss" in workout_dict
+            assert "workout_type" in workout_dict
+            assert "error" not in workout_dict
+
+        mock_loader.get_all_workouts.assert_called_once_with(sort_by_date=True)
+
+
+async def test_get_last_50_workouts_fewer_than_50():
+    """Test retrieval when fewer than 50 workouts exist."""
+    from datetime import datetime, timedelta
+    from unittest.mock import patch
+
+    from workout_mcp_server.data_loader import Workout
+    from workout_mcp_server.main import get_last_50_workouts
+
+    # Create only 30 mock workouts
+    mock_workouts = [
+        Workout(
+            id=f"test-{i:02d}",
+            date=datetime(2024, 1, 1) + timedelta(days=i),
+            duration_minutes=60,
+            distance_km=30.0,
+            avg_power_watts=200,
+            tss=75,
+            workout_type="endurance",
+        )
+        for i in range(30)
+    ]
+
+    with patch("workout_mcp_server.main.data_loader") as mock_loader:
+        mock_loader.get_all_workouts.return_value = mock_workouts
+
+        result = await get_last_50_workouts()
+
+        # Should return all 30 workouts (not 50)
+        assert isinstance(result, list)
+        assert len(result) == 30
+
+        # Verify each workout has required fields
+        for workout_dict in result:
+            assert "id" in workout_dict
+            assert "date" in workout_dict
+            assert "error" not in workout_dict
+
+        mock_loader.get_all_workouts.assert_called_once_with(sort_by_date=True)
+
+
+async def test_get_last_50_workouts_exception():
+    """Test handling of exceptions during workout retrieval."""
+    from unittest.mock import patch
+
+    from workout_mcp_server.main import get_last_50_workouts
+
+    with patch("workout_mcp_server.main.data_loader") as mock_loader:
+        mock_loader.get_all_workouts.side_effect = Exception("Database error")
+
+        result = await get_last_50_workouts()
+
+        assert isinstance(result, dict)
+        assert "error" in result
+        assert "Failed to retrieve workouts" in result["error"]
+        assert "Database error" in result["error"]

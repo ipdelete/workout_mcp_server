@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+#### Phase 3: get_last_50_workouts Tool Implementation (Issue #13)
+- Implemented `get_last_50_workouts` MCP tool in `src/workout_mcp_server/main.py`
+- Tool returns all 50 workouts from the dataset providing complete training history
+- Workouts are automatically sorted by date (newest first) using existing data loader
+- Includes all workout fields (id, date, duration_minutes, distance_km, avg_power_watts, tss, workout_type)
+- Comprehensive error handling with appropriate logging for failures
+- Leverages existing `WorkoutDataLoader.get_all_workouts()` method from Phase 2
+- Full test coverage with 4 new unit tests covering success cases, edge cases, and error handling
+- FastMCP decorator pattern for tool definition with proper type hints and documentation
+
 #### Phase 3: get_workout_by_id Tool Implementation (Issue #10)
 - Implemented `get_workout_by_id` MCP tool in `src/workout_mcp_server/main.py`
 - Tool accepts a workout_id parameter and returns complete workout details
