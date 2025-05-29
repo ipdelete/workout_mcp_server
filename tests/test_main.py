@@ -507,3 +507,208 @@ async def test_compute_fitness_exception():
         assert "error" in result
         assert "Failed to calculate CTL" in result["error"]
         assert "Database error" in result["error"]
+
+
+def test_compute_fatigue_tool_exists():
+    """Test that compute_fatigue tool is registered."""
+    from workout_mcp_server.main import compute_fatigue
+
+    assert callable(compute_fatigue)
+    assert hasattr(compute_fatigue, "__doc__")
+    assert "Acute Training Load" in compute_fatigue.__doc__
+    assert "ATL" in compute_fatigue.__doc__
+
+
+async def test_compute_fatigue_success():
+    """Test successful ATL calculation."""
+    from datetime import datetime, timedelta
+    from unittest.mock import patch
+
+    from workout_mcp_server.data_loader import Workout
+    from workout_mcp_server.main import compute_fatigue
+
+    # Create mock workouts over several weeks
+    mock_workouts = []
+    base_date = datetime(2024, 1, 1)
+    for i in range(30):  # 30 days of workouts
+        workout_date = base_date + timedelta(days=i)
+        mock_workouts.append(
+            Workout(
+                id=f"test-{i:02d}",
+                date=workout_date,
+                duration_minutes=60 + (i % 10),
+                distance_km=30.0 + (i % 5),
+                avg_power_watts=200 + (i % 20),
+                tss=75 + (i % 25),  # TSS varies from 75-99
+                workout_type="endurance",
+            )
+        )
+
+    with patch("workout_mcp_server.main.data_loader") as mock_loader:
+        mock_loader.get_all_workouts.return_value = mock_workouts
+
+        result = await compute_fatigue("2024-01-30")
+
+        assert isinstance(result, dict)
+        assert "error" not in result
+        assert result["target_date"] == "2024-01-30"
+        assert "atl" in result
+        assert isinstance(result["atl"], float)
+        assert result["atl"] > 0  # Should have positive ATL with workouts
+        assert result["workouts_count"] == 30
+        assert "date_range" in result
+        assert result["date_range"]["earliest_workout"] == "2024-01-01"
+        assert result["date_range"]["latest_workout"] == "2024-01-30"
+
+        mock_loader.get_all_workouts.assert_called_once_with(sort_by_date=False)
+
+
+async def test_compute_fatigue_no_workouts():
+    """Test ATL calculation with no workout data."""
+    from unittest.mock import patch
+
+    from workout_mcp_server.main import compute_fatigue
+
+    with patch("workout_mcp_server.main.data_loader") as mock_loader:
+        mock_loader.get_all_workouts.return_value = []
+
+        result = await compute_fatigue("2024-01-15")
+
+        assert isinstance(result, dict)
+        assert "error" not in result
+        assert result["target_date"] == "2024-01-15"
+        assert result["atl"] == 0.0
+        assert result["workouts_count"] == 0
+        assert "message" in result
+        assert "No workout data available" in result["message"]
+
+
+async def test_compute_fatigue_invalid_date():
+    """Test ATL calculation with invalid date format."""
+    from workout_mcp_server.main import compute_fatigue
+
+    result = await compute_fatigue("invalid-date")
+
+    assert isinstance(result, dict)
+    assert "error" in result
+    assert "Invalid date format" in result["error"]
+    assert "invalid-date" in result["error"]
+    assert "YYYY-MM-DD" in result["error"]
+
+
+async def test_compute_fatigue_realistic_values():
+    """Test ATL calculation produces realistic fatigue values."""
+    from datetime import datetime, timedelta
+    from unittest.mock import patch
+
+    from workout_mcp_server.data_loader import Workout
+    from workout_mcp_server.main import compute_fatigue
+
+    # Create workouts with realistic TSS progression
+    mock_workouts = []
+    base_date = datetime(2024, 1, 1)
+    tss_values = [
+        85,
+        95,
+        60,
+        110,
+        0,
+        0,
+        125,
+        90,
+        80,
+        105,
+    ]  # Week pattern with rest days
+
+    for i in range(50):  # 50 days of workouts
+        workout_date = base_date + timedelta(days=i)
+        tss = tss_values[i % len(tss_values)]
+
+        if tss > 0:  # Only create workout if TSS > 0 (no rest days)
+            mock_workouts.append(
+                Workout(
+                    id=f"test-{i:02d}",
+                    date=workout_date,
+                    duration_minutes=int(tss * 0.8),  # Approximate duration
+                    distance_km=30.0,
+                    avg_power_watts=200,
+                    tss=tss,
+                    workout_type="endurance",
+                )
+            )
+
+    with patch("workout_mcp_server.main.data_loader") as mock_loader:
+        mock_loader.get_all_workouts.return_value = mock_workouts
+
+        result = await compute_fatigue("2024-02-20")
+
+        assert isinstance(result, dict)
+        assert "error" not in result
+
+        # ATL should be in realistic range for cycling fatigue
+        assert 60 <= result["atl"] <= 120
+        assert result["workouts_count"] > 30  # Should have many workouts
+        assert result["atl"] > 0
+
+
+async def test_compute_fatigue_exception():
+    """Test handling of exceptions during ATL calculation."""
+    from unittest.mock import patch
+
+    from workout_mcp_server.main import compute_fatigue
+
+    with patch("workout_mcp_server.main.data_loader") as mock_loader:
+        mock_loader.get_all_workouts.side_effect = Exception("Database error")
+
+        result = await compute_fatigue("2024-01-15")
+
+        assert isinstance(result, dict)
+        assert "error" in result
+        assert "Failed to calculate ATL" in result["error"]
+        assert "Database error" in result["error"]
+
+
+async def test_compute_fatigue_vs_fitness_responsiveness():
+    """Test that ATL (7-day) is more responsive than CTL (42-day)."""
+    from datetime import datetime, timedelta
+    from unittest.mock import patch
+
+    from workout_mcp_server.data_loader import Workout
+    from workout_mcp_server.main import compute_fatigue, compute_fitness
+
+    # Create workouts with a big spike in recent TSS
+    mock_workouts = []
+    base_date = datetime(2024, 1, 1)
+
+    # 40 days of moderate TSS, then 5 days of high TSS
+    for i in range(45):
+        workout_date = base_date + timedelta(days=i)
+        tss = 70 if i < 40 else 150  # Big jump in last 5 days
+        mock_workouts.append(
+            Workout(
+                id=f"test-{i:02d}",
+                date=workout_date,
+                duration_minutes=60,
+                distance_km=30.0,
+                avg_power_watts=200,
+                tss=tss,
+                workout_type="endurance",
+            )
+        )
+
+    with patch("workout_mcp_server.main.data_loader") as mock_loader:
+        mock_loader.get_all_workouts.return_value = mock_workouts
+
+        target_date = "2024-02-14"  # Day 44
+        atl_result = await compute_fatigue(target_date)
+        ctl_result = await compute_fitness(target_date)
+
+        assert isinstance(atl_result, dict)
+        assert isinstance(ctl_result, dict)
+        assert "error" not in atl_result
+        assert "error" not in ctl_result
+
+        # ATL should be more responsive to recent high TSS values
+        assert atl_result["atl"] > ctl_result["ctl"]
+        assert atl_result["atl"] > 100  # Should be pulled up by recent high values
+        assert ctl_result["ctl"] < atl_result["atl"]  # CTL should be less responsive
