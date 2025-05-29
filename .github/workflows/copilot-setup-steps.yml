@@ -41,7 +41,10 @@ jobs:
       - name: Run initial checks
         run: |
           # Run type checking to ensure environment is valid
-          black . && ruff check . && mypy src/ && pytest
+          uv run black . 
+          uv run ruff check . 
+          uv run mypy src/ 
+          uv run pytest
 
       - name: Display project info
         run: |
