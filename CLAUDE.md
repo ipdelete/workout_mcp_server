@@ -69,16 +69,16 @@ Follow behavior-driven testing (ADR-001):
 
 ## Implementation Status
 
-Currently skeleton only - `src/workout_mcp_server/main.py` needs to be replaced with actual MCP server implementation using FastMCP. The following tools need to be implemented according to README:
-1. `get_last_50_workouts` - Retrieves all 50 workouts, sorted by date (most recent first)
-2. `get_last_7_workouts` - Retrieves the 7 most recent workouts
-3. `get_workout_by_id` - Retrieves specific workout by ID
-4. `compute_fitness` - Calculates CTL (42-day EWMA of TSS)
-5. `compute_fatigue` - Calculates ATL (7-day EWMA of TSS)
-6. `compute_form` - Calculates TSB (CTL - ATL)
+All MCP tools have been implemented:
+1. `get_last_50_workouts` - ✓ Retrieves all 50 workouts, sorted by date (most recent first)
+2. `get_last_7_workouts` - ✓ Retrieves the 7 most recent workouts
+3. `get_workout_by_id` - ✓ Retrieves specific workout by ID
+4. `compute_fitness` - ✓ Calculates CTL (42-day EWMA of TSS)
+5. `compute_fatigue` - ✓ Calculates ATL (7-day EWMA of TSS)
+6. `compute_form` - ✓ Calculates TSB (CTL - ATL)
 
 ## Key Files
-- `src/workout_mcp_server/main.py` - Main MCP server implementation (needs to be written)
+- `src/workout_mcp_server/main.py` - Main MCP server implementation
 - `src/workout_mcp_server/tools/` - Directory for tool implementations
 - `data_store/workouts.json` - Mock workout data
 - `tests/` - Test files following pytest conventions

@@ -712,3 +712,230 @@ async def test_compute_fatigue_vs_fitness_responsiveness():
         assert atl_result["atl"] > ctl_result["ctl"]
         assert atl_result["atl"] > 100  # Should be pulled up by recent high values
         assert ctl_result["ctl"] < atl_result["atl"]  # CTL should be less responsive
+
+
+# Tests for compute_form tool
+
+
+def test_compute_form_tool_exists():
+    """Test that compute_form tool is registered."""
+    from workout_mcp_server.main import compute_form
+
+    assert callable(compute_form)
+    assert hasattr(compute_form, "__doc__")
+    assert "Training Stress Balance" in compute_form.__doc__
+    assert "TSB" in compute_form.__doc__
+
+
+async def test_compute_form_success():
+    """Test successful TSB calculation."""
+    from unittest.mock import AsyncMock, patch
+
+    from workout_mcp_server.main import compute_form
+
+    # Mock successful responses from compute_fitness and compute_fatigue
+    mock_ctl_result = {
+        "target_date": "2024-02-14",
+        "ctl": 75.5,
+        "workouts_count": 42,
+        "date_range": {
+            "earliest_workout": "2024-01-04",
+            "latest_workout": "2024-02-14",
+        },
+    }
+
+    mock_atl_result = {
+        "target_date": "2024-02-14",
+        "atl": 82.3,
+        "workouts_count": 7,
+        "date_range": {
+            "earliest_workout": "2024-02-08",
+            "latest_workout": "2024-02-14",
+        },
+    }
+
+    with patch(
+        "workout_mcp_server.main.compute_fitness", new_callable=AsyncMock
+    ) as mock_fitness:
+        with patch(
+            "workout_mcp_server.main.compute_fatigue", new_callable=AsyncMock
+        ) as mock_fatigue:
+            mock_fitness.return_value = mock_ctl_result
+            mock_fatigue.return_value = mock_atl_result
+
+            result = await compute_form("2024-02-14")
+
+            # Verify the functions were called with correct parameters
+            mock_fitness.assert_called_once_with("2024-02-14")
+            mock_fatigue.assert_called_once_with("2024-02-14")
+
+            # Check result structure
+            assert isinstance(result, dict)
+            assert "error" not in result
+            assert result["target_date"] == "2024-02-14"
+            assert result["tsb"] == -6.8  # 75.5 - 82.3
+            assert result["ctl"] == 75.5
+            assert result["atl"] == 82.3
+            assert "interpretation" in result
+            assert "Fatigued" in result["interpretation"]
+            assert result["workouts_count"] == 42  # max of both counts
+
+
+async def test_compute_form_fresh_athlete():
+    """Test TSB calculation for a fresh athlete (positive TSB)."""
+    from unittest.mock import AsyncMock, patch
+
+    from workout_mcp_server.main import compute_form
+
+    # Mock responses showing low fatigue, higher fitness
+    mock_ctl_result = {"target_date": "2024-02-14", "ctl": 85.0, "workouts_count": 42}
+    mock_atl_result = {"target_date": "2024-02-14", "atl": 70.0, "workouts_count": 7}
+
+    with patch(
+        "workout_mcp_server.main.compute_fitness", new_callable=AsyncMock
+    ) as mock_fitness:
+        with patch(
+            "workout_mcp_server.main.compute_fatigue", new_callable=AsyncMock
+        ) as mock_fatigue:
+            mock_fitness.return_value = mock_ctl_result
+            mock_fatigue.return_value = mock_atl_result
+
+            result = await compute_form("2024-02-14")
+
+            assert result["tsb"] == 15.0  # 85.0 - 70.0
+            assert "Fresh" in result["interpretation"]
+
+
+async def test_compute_form_neutral_athlete():
+    """Test TSB calculation for neutral form (TSB near zero)."""
+    from unittest.mock import AsyncMock, patch
+
+    from workout_mcp_server.main import compute_form
+
+    # Mock responses showing balanced CTL and ATL
+    mock_ctl_result = {"target_date": "2024-02-14", "ctl": 80.0, "workouts_count": 42}
+    mock_atl_result = {"target_date": "2024-02-14", "atl": 77.5, "workouts_count": 7}
+
+    with patch(
+        "workout_mcp_server.main.compute_fitness", new_callable=AsyncMock
+    ) as mock_fitness:
+        with patch(
+            "workout_mcp_server.main.compute_fatigue", new_callable=AsyncMock
+        ) as mock_fatigue:
+            mock_fitness.return_value = mock_ctl_result
+            mock_fatigue.return_value = mock_atl_result
+
+            result = await compute_form("2024-02-14")
+
+            assert result["tsb"] == 2.5  # 80.0 - 77.5
+            assert "Neutral" in result["interpretation"]
+
+
+async def test_compute_form_invalid_date():
+    """Test compute_form with invalid date format."""
+    from unittest.mock import AsyncMock, patch
+
+    from workout_mcp_server.main import compute_form
+
+    # Mock compute_fitness to return an error
+    mock_error_result = {
+        "error": "Invalid date format 'bad-date'. Use YYYY-MM-DD format."
+    }
+
+    with patch(
+        "workout_mcp_server.main.compute_fitness", new_callable=AsyncMock
+    ) as mock_fitness:
+        mock_fitness.return_value = mock_error_result
+
+        result = await compute_form("bad-date")
+
+        # Should propagate the error from compute_fitness
+        assert "error" in result
+        assert "Invalid date format" in result["error"]
+
+
+async def test_compute_form_fitness_error():
+    """Test compute_form when compute_fitness returns an error."""
+    from unittest.mock import AsyncMock, patch
+
+    from workout_mcp_server.main import compute_form
+
+    mock_error_result = {"error": "Failed to calculate CTL: Database error"}
+
+    with patch(
+        "workout_mcp_server.main.compute_fitness", new_callable=AsyncMock
+    ) as mock_fitness:
+        mock_fitness.return_value = mock_error_result
+
+        result = await compute_form("2024-02-14")
+
+        assert "error" in result
+        assert "Failed to calculate CTL" in result["error"]
+
+
+async def test_compute_form_fatigue_error():
+    """Test compute_form when compute_fatigue returns an error."""
+    from unittest.mock import AsyncMock, patch
+
+    from workout_mcp_server.main import compute_form
+
+    mock_ctl_result = {"target_date": "2024-02-14", "ctl": 75.0, "workouts_count": 42}
+    mock_error_result = {"error": "Failed to calculate ATL: Database error"}
+
+    with patch(
+        "workout_mcp_server.main.compute_fitness", new_callable=AsyncMock
+    ) as mock_fitness:
+        with patch(
+            "workout_mcp_server.main.compute_fatigue", new_callable=AsyncMock
+        ) as mock_fatigue:
+            mock_fitness.return_value = mock_ctl_result
+            mock_fatigue.return_value = mock_error_result
+
+            result = await compute_form("2024-02-14")
+
+            assert "error" in result
+            assert "Failed to calculate ATL" in result["error"]
+
+
+async def test_compute_form_no_workouts():
+    """Test compute_form with no workout data."""
+    from unittest.mock import AsyncMock, patch
+
+    from workout_mcp_server.main import compute_form
+
+    # Mock responses with zero values
+    mock_ctl_result = {"target_date": "2024-02-14", "ctl": 0.0, "workouts_count": 0}
+    mock_atl_result = {"target_date": "2024-02-14", "atl": 0.0, "workouts_count": 0}
+
+    with patch(
+        "workout_mcp_server.main.compute_fitness", new_callable=AsyncMock
+    ) as mock_fitness:
+        with patch(
+            "workout_mcp_server.main.compute_fatigue", new_callable=AsyncMock
+        ) as mock_fatigue:
+            mock_fitness.return_value = mock_ctl_result
+            mock_fatigue.return_value = mock_atl_result
+
+            result = await compute_form("2024-02-14")
+
+            assert result["tsb"] == 0.0
+            assert result["ctl"] == 0.0
+            assert result["atl"] == 0.0
+            assert result["workouts_count"] == 0
+
+
+async def test_compute_form_exception_handling():
+    """Test compute_form handles unexpected exceptions."""
+    from unittest.mock import AsyncMock, patch
+
+    from workout_mcp_server.main import compute_form
+
+    with patch(
+        "workout_mcp_server.main.compute_fitness", new_callable=AsyncMock
+    ) as mock_fitness:
+        mock_fitness.side_effect = Exception("Unexpected error")
+
+        result = await compute_form("2024-02-14")
+
+        assert "error" in result
+        assert "Failed to calculate TSB" in result["error"]

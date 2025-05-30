@@ -9,6 +9,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+#### Phase 6: compute_form Tool Implementation (Issue #16)
+- Implemented `compute_form` MCP tool for Training Stress Balance (TSB) calculation
+- TSB calculated as the difference between CTL (fitness) and ATL (fatigue)
+- Tool accepts target_date parameter and returns TSB with interpretation
+- Interpretation of TSB values:
+  - TSB > 5: Fresh - Good readiness for hard training or competition
+  - TSB between -5 and 5: Neutral - Balanced training load
+  - TSB < -5: Fatigued - Consider recovery or lighter training
+- Reuses existing compute_fitness and compute_fatigue tools internally
+- Returns combined metadata including CTL, ATL, and workouts count
+- Comprehensive error handling propagates errors from dependent tools
+- Full test coverage with 9 new unit tests covering all scenarios
+- FastMCP decorator pattern with async/await for tool composition
+- Mathematical formula: TSB = CTL - ATL (positive = fresh, negative = fatigued)
+
 #### Phase 5: compute_fatigue Tool Implementation (Issue #15)
 - Implemented `compute_fatigue` MCP tool for Acute Training Load (ATL) calculation
 - ATL calculated as 7-day exponentially weighted moving average of TSS values
