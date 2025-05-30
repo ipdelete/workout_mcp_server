@@ -7,106 +7,67 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2025-05-30
+
 ### Added
+- **compute_form** tool ([#16](https://github.com/ianphil/workout_mcp_server/issues/16), [PR #29](https://github.com/ianphil/workout_mcp_server/pull/29))
+  - Calculates Training Stress Balance (TSB) as CTL minus ATL
+  - Provides interpretation of athlete's form/freshness state
+  - TSB > 5: Fresh, TSB -5 to 5: Neutral, TSB < -5: Fatigued
 
-#### Phase 6: compute_form Tool Implementation (Issue #16)
-- Implemented `compute_form` MCP tool for Training Stress Balance (TSB) calculation
-- TSB calculated as the difference between CTL (fitness) and ATL (fatigue)
-- Tool accepts target_date parameter and returns TSB with interpretation
-- Interpretation of TSB values:
-  - TSB > 5: Fresh - Good readiness for hard training or competition
-  - TSB between -5 and 5: Neutral - Balanced training load
-  - TSB < -5: Fatigued - Consider recovery or lighter training
-- Reuses existing compute_fitness and compute_fatigue tools internally
-- Returns combined metadata including CTL, ATL, and workouts count
-- Comprehensive error handling propagates errors from dependent tools
-- Full test coverage with 9 new unit tests covering all scenarios
-- FastMCP decorator pattern with async/await for tool composition
-- Mathematical formula: TSB = CTL - ATL (positive = fresh, negative = fatigued)
+## [0.1.5] - 2025-05-29
 
-#### Phase 5: compute_fatigue Tool Implementation (Issue #15)
-- Implemented `compute_fatigue` MCP tool for Acute Training Load (ATL) calculation
-- ATL calculated as 7-day exponentially weighted moving average of TSS values
-- Reuses existing EWMA utility function and workout filtering logic from fitness metrics module
-- Tool accepts target_date parameter and returns ATL with metadata (workouts count, date range)
-- Comprehensive error handling for invalid dates, missing data, and exceptions
-- Edge case handling for insufficient workout data with appropriate messaging
-- Full test coverage with 7 new unit tests including responsiveness comparison with CTL
-- Mathematical formula: alpha = 1 - exp(-1/7) for 7-day time constant
-- FastMCP decorator pattern with proper type hints and documentation
-- ATL represents fatigue and is more responsive to recent training load changes than CTL
+### Added
+- **compute_fatigue** tool ([#15](https://github.com/ianphil/workout_mcp_server/issues/15), [PR #28](https://github.com/ianphil/workout_mcp_server/pull/28))
+  - Calculates Acute Training Load (ATL) using 7-day EWMA of TSS
+  - Represents short-term training stress and fatigue
+  
+- **compute_fitness** tool ([#14](https://github.com/ianphil/workout_mcp_server/issues/14), [PR #27](https://github.com/ianphil/workout_mcp_server/pull/27))
+  - Calculates Chronic Training Load (CTL) using 42-day EWMA of TSS
+  - Represents long-term fitness adaptation
+  - Created reusable EWMA utility function in `tools/fitness_metrics.py`
 
-#### Phase 4: compute_fitness Tool Implementation (Issue #14)
-- Implemented `compute_fitness` MCP tool for Chronic Training Load (CTL) calculation
-- CTL calculated as 42-day exponentially weighted moving average of TSS values
-- Reusable EWMA utility function in `src/workout_mcp_server/tools/fitness_metrics.py`
-- Tool accepts target_date parameter and returns CTL with metadata (workouts count, date range)
-- Comprehensive error handling for invalid dates, missing data, and exceptions
-- Edge case handling for insufficient workout data with appropriate messaging
-- Full test coverage with 20 new unit tests for EWMA calculations and tool functionality
-- Mathematical formula: alpha = 1 - exp(-1/42) for 42-day time constant
-- FastMCP decorator pattern with proper type hints and documentation
-- Fitness metrics module designed for reuse by future ATL and TSB tools
+- **get_last_50_workouts** tool ([#13](https://github.com/ianphil/workout_mcp_server/issues/13), [PR #26](https://github.com/ianphil/workout_mcp_server/pull/26))
+  - Returns all 50 workouts sorted by date (newest first)
+  - Provides complete training history for analysis
 
-#### Phase 3: get_last_50_workouts Tool Implementation (Issue #13)
-- Implemented `get_last_50_workouts` MCP tool in `src/workout_mcp_server/main.py`
-- Tool returns all 50 workouts from the dataset providing complete training history
-- Workouts are automatically sorted by date (newest first) using existing data loader
-- Includes all workout fields (id, date, duration_minutes, distance_km, avg_power_watts, tss, workout_type)
-- Comprehensive error handling with appropriate logging for failures
-- Leverages existing `WorkoutDataLoader.get_all_workouts()` method from Phase 2
-- Full test coverage with 4 new unit tests covering success cases, edge cases, and error handling
-- FastMCP decorator pattern for tool definition with proper type hints and documentation
-
-#### Phase 3: get_workout_by_id Tool Implementation (Issue #10)
-- Implemented `get_workout_by_id` MCP tool in `src/workout_mcp_server/main.py`
-- Tool accepts a workout_id parameter and returns complete workout details
-- Returns appropriate error message if workout not found or on exceptions
-- Leverages existing `WorkoutDataLoader.get_workout_by_id()` method from Phase 2
-- Includes proper error handling and logging
-- Full test coverage with unit tests for success and error cases
-- FastMCP decorator pattern for tool definition with type hints
-
-#### Phase 2: Data Loading Functionality (Issue #9)
-- Comprehensive data loading module in `src/workout_mcp_server/data_loader.py`
-- Pydantic-based `Workout` model for data validation and parsing
-- `WorkoutDataLoader` class with caching support for efficient data access
-- Functions to load, validate, sort, and filter workout data by date range
-- Automatic date parsing from ISO format strings to datetime objects
-- Robust error handling with custom `WorkoutDataError` exception
-- Full test coverage with 26 unit tests for all data loading functionality
-- Type hints and mypy compliance for all functions and methods
-
-#### Phase 2: Mock Workout Data Generation
-- Python script to generate 50 mock cycling workout entries in `scripts/generate_mock_data.py`
-- Mock data stored in JSON format at `data_store/workouts.json`
-- Realistic workout data with proper TSS calculations based on duration, power, and workout type
-- Training plan generator that creates realistic patterns (build weeks, recovery weeks, rest days)
-- Comprehensive test suite for data generation logic
-- Data model includes: id, date, duration_minutes, distance_km, avg_power_watts, tss, workout_type
-
-#### Phase 1: MCP Server Skeleton
-- MCP server skeleton implementation using FastMCP framework
-- Basic server initialization with logging configuration  
-- Tools directory structure for future tool implementations
-- Server responds to MCP protocol handshake
-- Tests for server instance creation and configuration
-
-#### Development Environment Setup
-- Python development environment configuration with FastMCP framework
-- Project structure with proper Python package layout in `src/workout_mcp_server/`
-- Development dependencies: pytest, black, mypy, ruff for code quality
-- Basic test suite to verify environment setup
-- Package entry points for running with `python -m workout_mcp_server`
-
-### Changed
-- Python version requirement updated to 3.10+ (required by FastMCP)
-- Project configuration moved to modern pyproject.toml format with hatchling build backend
+- **get_last_7_workouts** tool ([#12](https://github.com/ianphil/workout_mcp_server/issues/12), [PR #25](https://github.com/ianphil/workout_mcp_server/pull/25))
+  - Returns the 7 most recent workouts
+  - Useful for current training week analysis
 
 ## [0.1.0] - 2025-05-28
 
 ### Added
-- Initial project structure and documentation
-- Architecture Decision Records (ADRs) for testing philosophy and MCP framework selection
-- Project requirements documentation (PRD)
-- Basic README with project overview
+- **Initial Release** - Complete foundation for Workout MCP Server
+  
+- **MCP Tools**
+  - `get_workout_by_id` tool ([#10](https://github.com/ianphil/workout_mcp_server/issues/10), [PR #24](https://github.com/ianphil/workout_mcp_server/pull/24))
+    - Retrieves specific workout by ID
+    - Returns complete workout details
+
+- **Data Infrastructure**
+  - Data loading functionality ([#9](https://github.com/ianphil/workout_mcp_server/issues/9), [PR #23](https://github.com/ianphil/workout_mcp_server/pull/23))
+    - Pydantic-based `Workout` model
+    - `WorkoutDataLoader` class with caching
+    - Date parsing and validation
+  - Mock data generation ([#8](https://github.com/ianphil/workout_mcp_server/issues/8), [PR #22](https://github.com/ianphil/workout_mcp_server/pull/22))
+    - 50 realistic cycling workouts
+    - Training patterns with build/recovery weeks
+
+- **Server Foundation**
+  - MCP server skeleton ([#7](https://github.com/ianphil/workout_mcp_server/issues/7), [PR #21](https://github.com/ianphil/workout_mcp_server/pull/21))
+    - FastMCP framework integration
+    - Logging configuration
+    - Tools directory structure
+  - Python environment setup ([#6](https://github.com/ianphil/workout_mcp_server/issues/6), [PR #20](https://github.com/ianphil/workout_mcp_server/pull/20))
+    - Development dependencies (pytest, black, mypy, ruff)
+    - Modern pyproject.toml configuration
+  - Project structure ([#5](https://github.com/ianphil/workout_mcp_server/issues/5), [PR #1](https://github.com/ianphil/workout_mcp_server/pull/1))
+    - Initial documentation (README, PRD, ADRs)
+    - Standard Python package layout
+
+### Technical Details
+- Python 3.10+ requirement (FastMCP dependency)
+- Full test coverage with 60+ unit tests
+- Type hints and mypy strict compliance
+- Async/await patterns for all MCP tools
