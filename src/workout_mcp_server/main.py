@@ -214,6 +214,61 @@ async def compute_fatigue(target_date: str) -> dict:
         return {"error": f"Failed to calculate ATL: {str(e)}"}
 
 
+@mcp.tool()
+async def compute_form(target_date: str) -> dict:
+    """Calculate Training Stress Balance (TSB) for a given date.
+
+    TSB represents form/freshness and is calculated as the difference
+    between CTL (fitness) and ATL (fatigue). Positive values indicate
+    freshness, negative values indicate fatigue.
+
+    Args:
+        target_date: Date in ISO format (YYYY-MM-DD) for TSB calculation
+
+    Returns:
+        Dictionary containing TSB value, interpretation, and metadata,
+        or error dictionary
+    """
+    try:
+        # Calculate CTL (fitness)
+        ctl_result = await compute_fitness(target_date)
+        if "error" in ctl_result:
+            return {"error": ctl_result["error"]}
+
+        # Calculate ATL (fatigue)
+        atl_result = await compute_fatigue(target_date)
+        if "error" in atl_result:
+            return {"error": atl_result["error"]}
+
+        # Calculate TSB (form)
+        ctl = ctl_result.get("ctl", 0.0)
+        atl = atl_result.get("atl", 0.0)
+        tsb = ctl - atl
+
+        # Interpret TSB value
+        if tsb > 5:
+            interpretation = "Fresh - Good readiness for hard training or competition"
+        elif tsb > -5:
+            interpretation = "Neutral - Balanced training load"
+        else:
+            interpretation = "Fatigued - Consider recovery or lighter training"
+
+        return {
+            "target_date": target_date,
+            "tsb": round(tsb, 1),
+            "ctl": ctl,
+            "atl": atl,
+            "interpretation": interpretation,
+            "workouts_count": max(
+                ctl_result.get("workouts_count", 0), atl_result.get("workouts_count", 0)
+            ),
+        }
+
+    except Exception as e:
+        logger.error(f"Error calculating TSB for {target_date}: {e}")
+        return {"error": f"Failed to calculate TSB: {str(e)}"}
+
+
 def configure_logging() -> None:
     """Configure logging for the MCP server."""
     logging.basicConfig(
