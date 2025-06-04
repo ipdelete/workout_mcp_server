@@ -166,10 +166,9 @@ class TestGetWorkoutsForCtlCalculation:
 
         result = get_workouts_for_ctl_calculation(workouts, target_date)
 
-        # Should return all workouts up to and including target date
-        # Days 0-59 (inclusive) = 60 workouts
-        assert len(result) == 60
-        assert result[0].date.date() == datetime(2024, 1, 1).date()
+        # Should return workouts within the 42-day window
+        assert len(result) == 42
+        assert result[0].date.date() == datetime(2024, 1, 19).date()
         assert result[-1].date.date() == datetime(2024, 2, 29).date()
 
     def test_different_time_constants(self):
@@ -189,3 +188,20 @@ class TestGetWorkoutsForCtlCalculation:
         # Both should return same workouts since all are within 7 days
         assert len(result_7day) == len(result_42day) == 3
         assert result_7day == result_42day
+
+    def test_respects_days_parameter(self):
+        """Test that the days parameter limits the returned workouts."""
+        # Create 10 sequential workouts
+        workouts = []
+        base_date = datetime(2024, 1, 1)
+        for i in range(10):
+            workout_date = base_date + timedelta(days=i)
+            workouts.append(self.create_workout(workout_date.strftime("%Y-%m-%d")))
+
+        target_date = datetime(2024, 1, 10)
+
+        result = get_workouts_for_ctl_calculation(workouts, target_date, days=5)
+
+        assert len(result) == 5
+        assert result[0].date.date() == datetime(2024, 1, 6).date()
+        assert result[-1].date.date() == datetime(2024, 1, 10).date()

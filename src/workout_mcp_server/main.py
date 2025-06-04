@@ -4,7 +4,7 @@ import logging
 from datetime import datetime
 from pathlib import Path
 
-from fastmcp import FastMCP
+from fastmcp import FastMCP  # type: ignore[import]
 
 from .data_loader import WorkoutDataLoader
 from .tools.fitness_metrics import calculate_ewma, get_workouts_for_ctl_calculation
@@ -35,7 +35,7 @@ async def get_workout_by_id(workout_id: str) -> dict:
             return {"error": f"Workout with ID '{workout_id}' not found"}
 
         # Convert Pydantic model to dict and format date as string
-        workout_dict = workout.model_dump()
+        workout_dict = workout.model_dump()  # type: ignore[attr-defined]
         workout_dict["date"] = workout.date.strftime("%Y-%m-%d")
         return workout_dict
     except Exception as e:
@@ -61,7 +61,7 @@ async def get_last_7_workouts() -> list[dict] | dict:
         # Convert each workout to dict format with date as string
         result = []
         for workout in recent_workouts:
-            workout_dict = workout.model_dump()
+            workout_dict = workout.model_dump()  # type: ignore[attr-defined]
             workout_dict["date"] = workout.date.strftime("%Y-%m-%d")
             result.append(workout_dict)
 
@@ -86,7 +86,7 @@ async def get_last_50_workouts() -> list[dict] | dict:
         # Convert each workout to dict format with date as string
         result = []
         for workout in workouts:
-            workout_dict = workout.model_dump()
+            workout_dict = workout.model_dump()  # type: ignore[attr-defined]
             workout_dict["date"] = workout.date.strftime("%Y-%m-%d")
             result.append(workout_dict)
 

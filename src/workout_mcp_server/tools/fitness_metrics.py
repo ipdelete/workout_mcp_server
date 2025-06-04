@@ -2,7 +2,7 @@
 
 import math
 from collections.abc import Sequence
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from ..data_loader import Workout
 
@@ -51,14 +51,17 @@ def get_workouts_for_ctl_calculation(
     Returns:
         List of workouts within the specified time window, sorted chronologically
     """
-    # Filter workouts up to and including target date
+    # Determine start date of the window
+    start_date = target_date - timedelta(days=days - 1)
+
+    # Filter workouts within the window [start_date, target_date]
     relevant_workouts = [
-        workout for workout in workouts if workout.date.date() <= target_date.date()
+        workout
+        for workout in workouts
+        if start_date.date() <= workout.date.date() <= target_date.date()
     ]
 
     # Sort by date (oldest first) for EWMA calculation
     relevant_workouts.sort(key=lambda w: w.date)
 
-    # Return all workouts if we have fewer than the desired window
-    # This allows gradual buildup of fitness metrics for new athletes
     return relevant_workouts
